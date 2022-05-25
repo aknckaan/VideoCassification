@@ -3,6 +3,9 @@ from pathlib import Path
 import csv
 from torchvision.io import read_video
 import kornia.augmentation as K
+import cv2
+import torch
+
 
 class VideoLoader(Dataset):
     def __init__(self, video_dir, annot_path):
@@ -25,6 +28,19 @@ class VideoLoader(Dataset):
 
     def __len__(self):
         return len(self.video_label_map)
+
+    def read_video(self, dir):
+        video = []
+        cap = cv2.VideoCapture(dir)
+        while(cap.isOpened()):
+            # Capture frame-by-frame
+            ret, frame = cap.read()
+            if ret == True:
+                video.append(frame)
+
+        video = torch.Tensor(video)
+        return video
+
 
     def __getitem__(self, idx):
         vid_name, label = self.video_label_map[idx]
